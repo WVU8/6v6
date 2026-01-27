@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WV-HEDW 6v6 opstelling</title>
+
+<!-- html2canvas voor PNG export -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+body {
+    font-family: system-ui, sans-serif;
+    padding: 10px;
+    background: #f8f9fa;
+}
+
+h2 { margin-top: 20px; }
+
+input {
+    width: 100%;
+    padding: 6px;
+    margin-bottom: 6px;
+    font-size: 1rem;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#btnToon { background: #28a745; color: white; }
+#btnPNG  { background: #25D366; color: white; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    font-size: 0.85rem;
+}
+
+th, td {
+    border: 1px solid #333;
+    padding: 6px;
+}
+
+th {
+    background: #e9f5e9;
+}
+
+.wissel {
+    background: #f3f3f3;
+    font-style: italic;
+}
+
+.huidige {
+    background: #ffeeba;
+}
+
+/* Alleen de opstelling netjes op de PNG */
+#opstellingContainer {
+    background: white;
+    padding: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Spelers invoeren</h2>
+
+<div id="inputs">
+    <input placeholder="Keeper 1, wissel 4">
+    <input placeholder="Keeper 2">
+    <input placeholder="Keeper 3">
+    <input placeholder="Keeper 4">
+    <input placeholder="2 x voor">
+    <input placeholder="3 x voor">
+    <input placeholder="3 x midmid">
+    <input placeholder="3x voor">
+</div>
+
+<button id="btnToon" onclick="genereerOpstelling()">Toon opstelling</button>
+
+<h2>Opstelling per kwart</h2>
+
+<div id="opstellingContainer">
+<table>
+    <thead>
+        <tr>
+            <th>Kwart</th>
+            <th>Keeper</th>
+            <th>Achter</th>
+            <th>Achter</th>
+            <th>Midmid</th>
+            <th>Voor</th>
+            <th>Voor</th>
+            <th>Wissel</th>
+            <th>Wissel</th>
+        </tr>
+    </thead>
+    <tbody id="tabel"></tbody>
+</table>
+</div>
+
+<button id="btnPNG" onclick="exporteerPNG()">Genereer PNG / Deel</button>
+
+<script>
+// === VASTE FORMULE ===
+// Volgorde: Keeper, Achter, Achter, Midmid, Voor, Voor, Wissel, Wissel
+const formule = [
+[0,	2,	1,	3,	5,	4,	6,	7],
+[1,	0,	3,	6,	4,	7,	2,	5],
+[2,	0,	1,	6,	5,	7,	3,	4],
+[3,	2,	4,	6,	5,	7,	0,	1]
+];
+
+// Laad opgeslagen namen
+window.addEventListener("load", () => {
+    const opgeslagen = JSON.parse(localStorage.getItem("spelers") || "[]");
+    if (opgeslagen.length === 8) {
+        document.querySelectorAll("#inputs input")
+            .forEach((input, i) => input.value = opgeslagen[i]);
+        genereerOpstelling();
+    }
+});
+
+function genereerOpstelling() {
+    const namen = [...document.querySelectorAll("#inputs input")]
+        .map(i => i.value || "");
+
+    localStorage.setItem("spelers", JSON.stringify(namen));
+
+    const tbody = document.getElementById("tabel");
+    tbody.innerHTML = "";
+
+    formule.forEach((kwart, i) => {
+        const tr = document.createElement("tr");
+
+        const kwartCel = document.createElement("td");
+        kwartCel.textContent = `${i + 1}e`;
+        tr.appendChild(kwartCel);
+
+        kwart.forEach((index, pos) => {
+            const td = document.createElement("td");
+            td.textContent = namen[index] || "";
+            if (pos >= 6) td.className = "wissel";
+            tr.appendChild(td);
+        });
+
+        // huidige kwart highlight (standaard 1e)
+    //    if (i === 0) tr.classList.add("huidige");
+
+        tbody.appendChild(tr);
+    });
+}
+
+// === PNG EXPORT + DELEN ===
+function exporteerPNG() {
+    const element = document.getElementById("opstellingContainer");
+
+    html2canvas(element, {
+        scale: 2,
+        backgroundColor: "#ffffff"
+    }).then(canvas => {
+        canvas.toBlob(blob => {
+            const file = new File([blob], "opstelling-voetbal.png", {
+                type: "image/png"
+            });
+
+            // Mobiel: share-sheet (WhatsApp, etc.)
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                navigator.share({
+                    files: [file],
+                    title: "Voetbalopstelling",
+                    text: "Opstelling per kwart"
+                });
+            } else {
+                // Desktop fallback: downloaden
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = "opstelling-voetbal.png";
+                link.click();
+                URL.revokeObjectURL(link.href);
+            }
+        });
+    });
+}
+</script>
+
+</body>
+</html>
