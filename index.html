@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WV-HEDW 6v6 opstelling</title>
 
-<!-- html2canvas voor PNG export -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
@@ -34,22 +33,53 @@ button {
     cursor: pointer;
 }
 
-#btnToon { background: #6495ED; color: white; }
-#btnPNG  { background: #6495ED; color: white; }
+#btnToon, #btnPNG {
+    background: #6495ED;
+    color: white;
+}
 
-table {
+#opstellingContainer {
+    background: white;
+    padding: 10px;
+    max-width: 900px;
+    margin: auto;
+}
+
+#wedsBlok {
+    text-align: center;
+    margin-bottom: 6px;
+}
+
+#wedsNaam {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+#wedsDatum {
+    font-size: 0.9rem;
+}
+
+#teamLogo {
+    max-width: 50px;
+    height: auto;
+    margin-bottom: 6px;
+}
+
+/* Tabel met vaste kolommen */
+#opstellingContainer table {
     width: 100%;
     border-collapse: collapse;
     text-align: center;
     font-size: 0.85rem;
+    table-layout: fixed;
 }
 
-th, td {
+#opstellingContainer th, #opstellingContainer td {
     border: 1px solid #333;
     padding: 6px;
 }
 
-th {
+#opstellingContainer th {
     background: #e9f5e9;
 }
 
@@ -57,150 +87,152 @@ th {
     background: #f3f3f3;
     font-style: italic;
 }
-
-.huidige {
-    background: #ffeeba;
-}
-
-/* Alleen de opstelling netjes op de PNG */
-#opstellingContainer {
-    background: white;
-    padding: 10px;
-}
 </style>
 </head>
 
 <body>
-<!-- Logo bovenaan -->
-<div id="logoContainer">
-    <img src="wv.png" alt="WV O8 toppers" id="teamLogo">
-</div>
 
-<H4>👉🏽Iedere wedstrijd vier keepers die de wedstrijd ervoor niet gekeept hebben.
-👉🏽Keepers zijn in deze opstelling ook verdediger, zodat ze samen beter leren verdedigen.
-👉🏽De aanvallers en midmid spelen daar drie kwartjes zodat er beter aan wennen.
-👉🏽Volgende week nieuwe keepers en dus ook nieuwe aanvallers en midmid.</H4>
+<h2>Wedstrijdgegevens</h2>
+<input id="wedstrijdInput" placeholder="Wedstrijd (bijv. CTO '70 JO8-1 – WV-HEDW JO8-2)">
+<input id="datumInput" type="date">
 
-    <h2>Voer hier je 8 spelersnamen in.👇🏽</h2>
+<h4>
+👉🏽Iedere wedstrijd vier keepers die de wedstrijd ervoor niet gekeept hebben.<br>
+👉🏽Keepers zijn ook verdediger.<br>
+👉🏽Aanvallers en midmid spelen drie kwartjes.<br>
+👉🏽Volgende week nieuwe keepers.
+</h4>
 
-
+<h2>Voer hier je 8 spelersnamen in 👇🏽</h2>
 <div id="inputs">
-    <input placeholder="Keeper in blokje 1 (en wissel in blokje 4)">
-    <input placeholder="Keeper in blokje 2 (en wissel in blokje 3)">
-    <input placeholder="Keeper in blokje 3 (en wissel in blokje 2)">
-    <input placeholder="Keeper in blokje 4 (en wissel in blokje 1)">
-    <input placeholder="twee blokjes aanvaller (=wissel in blokje 4)">
-    <input placeholder="drie blokjes aanvaller (=wissel in blokje 2)">
-    <input placeholder="drie blokjes midmid (=wissel in blokje 3)">
-    <input placeholder="drie blokjes aanvaller (=wissel in blokje 1)">
+    <input placeholder="Keeper blok 1">
+    <input placeholder="Keeper blok 2">
+    <input placeholder="Keeper blok 3">
+    <input placeholder="Keeper blok 4">
+    <input placeholder="Aanvaller (2 blokjes)">
+    <input placeholder="Aanvaller (3 blokjes)">
+    <input placeholder="Midmid (3 blokjes)">
+    <input placeholder="Aanvaller (3 blokjes)">
 </div>
 
-<button id="btnToon" onclick="genereerOpstelling()">Toon opstelling</button>
+<button id="btnToon">Toon opstelling</button>
 
 <h2>Opstelling per kwart</h2>
 
 <div id="opstellingContainer">
-<table>
-    <thead>
-        <tr>
-            <th>Kwart</th>
-            <th>Keeper</th>
-            <th>Achter</th>
-            <th>Achter</th>
-            <th>Midmid</th>
-            <th>Voor</th>
-            <th>Voor</th>
-            <th>Wissel</th>
-            <th>Wissel</th>
-        </tr>
-    </thead>
-    <tbody id="tabel"></tbody>
-</table>
+
+    <!-- Logo in PNG -->
+    <div style="text-align:center;">
+        <img src="wv.png" alt="WV O8 toppers" id="teamLogo">
+    </div>
+
+    <!-- Wedstrijd + datum -->
+    <div id="wedsBlok">
+        <div id="wedsNaam"></div>
+        <div id="wedsDatum"></div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width:60px;">Kwart</th>
+                <th style="width:60px;">Keeper</th>
+                <th style="width:60px;">Achter</th>
+                <th style="width:60px;">Achter</th>
+                <th style="width:60px;">Midmid</th>
+                <th style="width:60px;">Voor</th>
+                <th style="width:60px;">Voor</th>
+                <th style="width:60px;">Wissel</th>
+                <th style="width:60px;">Wissel</th>
+            </tr>
+        </thead>
+        <tbody id="tabel"></tbody>
+    </table>
 </div>
 
-<button id="btnPNG" onclick="exporteerPNG()">Genereer PNG / Deel</button>
+<button id="btnPNG">Genereer PNG / Deel</button>
 
 <script>
-// === VASTE FORMULE ===
-// Volgorde: Keeper, Achter, Achter, Midmid, Voor, Voor, Wissel, Wissel
-const formule =[
-[0,	1,	2,	6,	4,	5,	3,	7],
-[1,	0,	3,	6,	4,	7,	2,	5],
-[2,	0,	3,	4,	5,	7,	1,	6],
-[3,	1,	2,	6,	5,	7,	0,	4]
+// === ELEMENTEN ===
+const wedstrijdInput = document.getElementById("wedstrijdInput");
+const datumInput     = document.getElementById("datumInput");
+const wedsNaam       = document.getElementById("wedsNaam");
+const wedsDatum      = document.getElementById("wedsDatum");
+const tabel          = document.getElementById("tabel");
+const btnToon        = document.getElementById("btnToon");
+const btnPNG         = document.getElementById("btnPNG");
+
+// === FORMULE ===
+const formule = [
+    [0,1,2,6,4,5,3,7],
+    [1,0,3,6,4,7,2,5],
+    [2,0,3,4,5,7,1,6],
+    [3,1,2,6,5,7,0,4]
 ];
 
-// Laad opgeslagen namen
+// === LOAD ===
 window.addEventListener("load", () => {
-    const opgeslagen = JSON.parse(localStorage.getItem("spelers") || "[]");
-    if (opgeslagen.length === 8) {
-        document.querySelectorAll("#inputs input")
-            .forEach((input, i) => input.value = opgeslagen[i]);
-        genereerOpstelling();
-    }
+    wedstrijdInput.value = localStorage.getItem("wedstrijd") || "";
+    datumInput.value = localStorage.getItem("datum") || "";
+
+    const spelers = JSON.parse(localStorage.getItem("spelers") || "[]");
+    document.querySelectorAll("#inputs input").forEach((inp,i)=>{
+        inp.value = spelers[i] || "";
+    });
+
+    genereerOpstelling();
 });
 
+// === OPSTELLING ===
 function genereerOpstelling() {
     const namen = [...document.querySelectorAll("#inputs input")]
         .map(i => i.value || "");
 
     localStorage.setItem("spelers", JSON.stringify(namen));
+    localStorage.setItem("wedstrijd", wedstrijdInput.value);
+    localStorage.setItem("datum", datumInput.value);
 
-    const tbody = document.getElementById("tabel");
-    tbody.innerHTML = "";
+    wedsNaam.textContent = wedstrijdInput.value;
+    wedsDatum.textContent = datumInput.value
+        ? new Date(datumInput.value).toLocaleDateString("nl-NL")
+        : "";
 
-    formule.forEach((kwart, i) => {
+    tabel.innerHTML = "";
+    formule.forEach((kwart,i)=>{
         const tr = document.createElement("tr");
-
-        const kwartCel = document.createElement("td");
-        kwartCel.textContent = `${i + 1}e`;
-        tr.appendChild(kwartCel);
-
-        kwart.forEach((index, pos) => {
+        tr.innerHTML = `<td>${i+1}e</td>`;
+        kwart.forEach((idx,pos)=>{
             const td = document.createElement("td");
-            td.textContent = namen[index] || "";
-            if (pos >= 6) td.className = "wissel";
+            td.textContent = namen[idx] || "";
+            if(pos>=6) td.className="wissel";
             tr.appendChild(td);
         });
-
-        // huidige kwart highlight (standaard 1e)
-    //    if (i === 0) tr.classList.add("huidige");
-
-        tbody.appendChild(tr);
+        tabel.appendChild(tr);
     });
 }
 
-// === PNG EXPORT + DELEN ===
-function exporteerPNG() {
-    const element = document.getElementById("opstellingContainer");
+// === KNOPPEN ===
+btnToon.addEventListener("click", genereerOpstelling);
 
-    html2canvas(element, {
-        scale: 2,
-        backgroundColor: "#ffffff"
-    }).then(canvas => {
-        canvas.toBlob(blob => {
-            const file = new File([blob], "opstelling-voetbal.png", {
-                type: "image/png"
-            });
-
-            // Mobiel: share-sheet (WhatsApp, etc.)
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                navigator.share({
-                    files: [file],
-                    title: "Voetbalopstelling",
-                    text: "Opstelling per kwart"
-                });
+btnPNG.addEventListener("click", ()=>{
+    html2canvas(document.getElementById("opstellingContainer"),{
+        scale:2,
+        width:900,
+        backgroundColor:"#ffffff"
+    }).then(canvas=>{
+        canvas.toBlob(blob=>{
+            const file = new File([blob],"opstelling.png",{type:"image/png"});
+            if(navigator.canShare && navigator.canShare({files:[file]})){
+                navigator.share({files:[file]});
             } else {
-                // Desktop fallback: downloaden
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.download = "opstelling-voetbal.png";
-                link.click();
-                URL.revokeObjectURL(link.href);
+                const a=document.createElement("a");
+                a.href=URL.createObjectURL(blob);
+                a.download="opstelling.png";
+                a.click();
             }
         });
     });
-}
+});
 </script>
 
 </body>
