@@ -59,24 +59,22 @@ th {
     font-style: italic;
 }
 
-/* PNG-gebied */
 #opstellingContainer {
     background: white;
     padding: 10px;
 }
 
-/* Wedstrijd + datum boven opstelling */
-#wedstrijdBlok {
+#wedsBlok {
     text-align: center;
     margin-bottom: 8px;
 }
 
-#wedstrijdWeergave {
+#wedsNaam {
     font-weight: bold;
     font-size: 1.1rem;
 }
 
-#datumWeergave {
+#wedsDatum {
     font-size: 0.9rem;
 }
 </style>
@@ -84,9 +82,8 @@ th {
 
 <body>
 
-<!-- Logo -->
-<div id="logoContainer">
-    <img src="wv.png" alt="WV O8 toppers" id="teamLogo" style="max-width:60px;">
+<div>
+    <img src="wv.png" alt="WV O8 toppers" style="max-width:60px;">
 </div>
 
 <h2>Wedstrijdgegevens</h2>
@@ -95,34 +92,34 @@ th {
 
 <h4>
 👉🏽Iedere wedstrijd vier keepers die de wedstrijd ervoor niet gekeept hebben.<br>
-👉🏽Keepers zijn in deze opstelling ook verdediger.<br>
-👉🏽De aanvallers en midmid spelen daar drie kwartjes.<br>
+👉🏽Keepers zijn ook verdediger.<br>
+👉🏽Aanvallers en midmid spelen drie kwartjes.<br>
 👉🏽Volgende week nieuwe keepers.
 </h4>
 
 <h2>Voer hier je 8 spelersnamen in 👇🏽</h2>
 
 <div id="inputs">
-    <input placeholder="Keeper in blokje 1">
-    <input placeholder="Keeper in blokje 2">
-    <input placeholder="Keeper in blokje 3">
-    <input placeholder="Keeper in blokje 4">
+    <input placeholder="Keeper blok 1">
+    <input placeholder="Keeper blok 2">
+    <input placeholder="Keeper blok 3">
+    <input placeholder="Keeper blok 4">
     <input placeholder="Aanvaller (2 blokjes)">
     <input placeholder="Aanvaller (3 blokjes)">
     <input placeholder="Midmid (3 blokjes)">
     <input placeholder="Aanvaller (3 blokjes)">
 </div>
 
-<button id="btnToon" onclick="genereerOpstelling()">Toon opstelling</button>
+<button id="btnToon">Toon opstelling</button>
 
 <h2>Opstelling per kwart</h2>
 
 <div id="opstellingContainer">
 
-    <!-- 🔹 DIT IS HET NIEUWE BLOK (IN PNG) -->
-    <div id="wedstrijdBlok">
-        <div id="wedstrijdWeergave"></div>
-        <div id="datumWeergave"></div>
+    <!-- Wedstrijd + datum (komt in PNG) -->
+    <div id="wedsBlok">
+        <div id="wedsNaam"></div>
+        <div id="wedsDatum"></div>
     </div>
 
     <table>
@@ -143,9 +140,19 @@ th {
     </table>
 </div>
 
-<button id="btnPNG" onclick="exporteerPNG()">Genereer PNG / Deel</button>
+<button id="btnPNG">Genereer PNG / Deel</button>
 
 <script>
+// === ELEMENTEN (EXPLICIET, iOS-proof) ===
+const wedstrijdInput = document.getElementById("wedstrijdInput");
+const datumInput     = document.getElementById("datumInput");
+const wedsNaam       = document.getElementById("wedsNaam");
+const wedsDatum      = document.getElementById("wedsDatum");
+const tabel          = document.getElementById("tabel");
+const btnToon        = document.getElementById("btnToon");
+const btnPNG         = document.getElementById("btnPNG");
+
+// === VASTE FORMULE ===
 const formule = [
     [0,1,2,6,4,5,3,7],
     [1,0,3,6,4,7,2,5],
@@ -153,17 +160,20 @@ const formule = [
     [3,1,2,6,5,7,0,4]
 ];
 
+// === LOAD ===
 window.addEventListener("load", () => {
     wedstrijdInput.value = localStorage.getItem("wedstrijd") || "";
     datumInput.value = localStorage.getItem("datum") || "";
 
-    const opgeslagen = JSON.parse(localStorage.getItem("spelers") || "[]");
-    document.querySelectorAll("#inputs input")
-        .forEach((input, i) => input.value = opgeslagen[i] || "");
+    const spelers = JSON.parse(localStorage.getItem("spelers") || "[]");
+    document.querySelectorAll("#inputs input").forEach((inp, i) => {
+        inp.value = spelers[i] || "";
+    });
 
     genereerOpstelling();
 });
 
+// === OPSTELLING ===
 function genereerOpstelling() {
     const namen = [...document.querySelectorAll("#inputs input")]
         .map(i => i.value || "");
@@ -172,8 +182,8 @@ function genereerOpstelling() {
     localStorage.setItem("wedstrijd", wedstrijdInput.value);
     localStorage.setItem("datum", datumInput.value);
 
-    wedstrijdWeergave.textContent = wedstrijdInput.value;
-    datumWeergave.textContent = datumInput.value
+    wedsNaam.textContent = wedstrijdInput.value;
+    wedsDatum.textContent = datumInput.value
         ? new Date(datumInput.value).toLocaleDateString("nl-NL")
         : "";
 
@@ -183,9 +193,9 @@ function genereerOpstelling() {
         const tr = document.createElement("tr");
         tr.innerHTML = `<td>${i + 1}e</td>`;
 
-        kwart.forEach((index, pos) => {
+        kwart.forEach((idx, pos) => {
             const td = document.createElement("td");
-            td.textContent = namen[index] || "";
+            td.textContent = namen[idx] || "";
             if (pos >= 6) td.className = "wissel";
             tr.appendChild(td);
         });
@@ -194,7 +204,10 @@ function genereerOpstelling() {
     });
 }
 
-function exporteerPNG() {
+// === KNOPPEN ===
+btnToon.addEventListener("click", genereerOpstelling);
+
+btnPNG.addEventListener("click", () => {
     html2canvas(document.getElementById("opstellingContainer"), {
         scale: 2,
         backgroundColor: "#ffffff"
@@ -212,7 +225,7 @@ function exporteerPNG() {
             }
         });
     });
-}
+});
 </script>
 
 </body>
