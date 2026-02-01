@@ -67,6 +67,33 @@ th {
     background: white;
     padding: 10px;
 }
+#headerBalk {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    background: #6495ED;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+}
+
+#teamLogo {
+    max-width: 60px;
+    height: auto;
+}
+
+#wedstrijdWeergave {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+#datumWeergave {
+    text-align: right;
+    font-size: 0.85rem;
+}
+    
+    
 </style>
 </head>
 
@@ -75,12 +102,16 @@ th {
 <div id="logoContainer">
     <img src="wv.png" alt="WV O8 toppers" id="teamLogo">
 </div>
+    
+<h2>Wedstrijdgegevens</h2>
+<input id="wedstrijdInput" placeholder="Wedstrijd (bijv. JO11-2 – JO11-3)">
+<input id="datumInput" type="date">
 
+    
 <H4>👉🏽Iedere wedstrijd vier keepers die de wedstrijd ervoor niet gekeept hebben.
 👉🏽Keepers zijn in deze opstelling ook verdediger, zodat ze beter leren samen verdedigen.
 👉🏽De aanvallers en midmid spelen daar drie kwartjes zodat zij er beter aan wennen.
-👉🏽Volgende week nieuwe keepers en dus ook nieuwe aanvallers en midmid.
-👉🏽Als er een speler niet is maak je het vakje van eerste aanvaller leeg</H4>
+👉🏽Volgende week nieuwe keepers en dus ook nieuwe aanvallers en midmid.</H4>
 
     <h2>Voer hier je 8 spelersnamen in.👇🏽</h2>
 
@@ -95,10 +126,8 @@ th {
     <input placeholder="drie blokjes aanvaller (=wissel in blokje 1)">
 </div>
 
-      <h2>Voer hier, optioneel, de wedstrijd in.👇🏽</h2>
-  <div id="inputsmatch">
-    <input placeholder="wedstrijd, wie tegen wie, tijd, plaats">
-</div>
+<label for="wedstrijdInput"><strong>Wedstrijd</strong></label>
+<input id="wedstrijdInput" placeholder="Bijv. WV JO8-2 – Atletico JO8-2 | zaterdag 7 februari 09:00u">
   
 <button id="btnToon" onclick="genereerOpstelling()">Toon opstelling</button>
 
