@@ -38,35 +38,16 @@ button {
     color: white;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: center;
-    font-size: 0.85rem;
-}
-
-th, td {
-    border: 1px solid #333;
-    padding: 6px;
-}
-
-th {
-    background: #e9f5e9;
-}
-
-.wissel {
-    background: #f3f3f3;
-    font-style: italic;
-}
-
 #opstellingContainer {
     background: white;
     padding: 10px;
+    max-width: 900px;
+    margin: auto;
 }
 
 #wedsBlok {
     text-align: center;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 #wedsNaam {
@@ -77,14 +58,39 @@ th {
 #wedsDatum {
     font-size: 0.9rem;
 }
+
+#teamLogo {
+    max-width: 50px;
+    height: auto;
+    margin-bottom: 6px;
+}
+
+/* Tabel met vaste kolommen */
+#opstellingContainer table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    font-size: 0.85rem;
+    table-layout: fixed;
+}
+
+#opstellingContainer th, #opstellingContainer td {
+    border: 1px solid #333;
+    padding: 6px;
+}
+
+#opstellingContainer th {
+    background: #e9f5e9;
+}
+
+.wissel {
+    background: #f3f3f3;
+    font-style: italic;
+}
 </style>
 </head>
 
 <body>
-
-<div>
-    <img src="wv.png" alt="WV O8 toppers" style="max-width:60px;">
-</div>
 
 <h2>Wedstrijdgegevens</h2>
 <input id="wedstrijdInput" placeholder="Wedstrijd (bijv. CTO '70 JO8-1 – WV-HEDW JO8-2)">
@@ -98,7 +104,6 @@ th {
 </h4>
 
 <h2>Voer hier je 8 spelersnamen in 👇🏽</h2>
-
 <div id="inputs">
     <input placeholder="Keeper blok 1">
     <input placeholder="Keeper blok 2">
@@ -116,7 +121,12 @@ th {
 
 <div id="opstellingContainer">
 
-    <!-- Wedstrijd + datum (komt in PNG) -->
+    <!-- Logo in PNG -->
+    <div style="text-align:center;">
+        <img src="wv.png" alt="WV O8 toppers" id="teamLogo">
+    </div>
+
+    <!-- Wedstrijd + datum -->
     <div id="wedsBlok">
         <div id="wedsNaam"></div>
         <div id="wedsDatum"></div>
@@ -125,15 +135,15 @@ th {
     <table>
         <thead>
             <tr>
-                <th>Kwart</th>
-                <th>Keeper</th>
-                <th>Achter</th>
-                <th>Achter</th>
-                <th>Midmid</th>
-                <th>Voor</th>
-                <th>Voor</th>
-                <th>Wissel</th>
-                <th>Wissel</th>
+                <th style="width:60px;">Kwart</th>
+                <th style="width:60px;">Keeper</th>
+                <th style="width:60px;">Achter</th>
+                <th style="width:60px;">Achter</th>
+                <th style="width:60px;">Midmid</th>
+                <th style="width:60px;">Voor</th>
+                <th style="width:60px;">Voor</th>
+                <th style="width:60px;">Wissel</th>
+                <th style="width:60px;">Wissel</th>
             </tr>
         </thead>
         <tbody id="tabel"></tbody>
@@ -143,7 +153,7 @@ th {
 <button id="btnPNG">Genereer PNG / Deel</button>
 
 <script>
-// === ELEMENTEN (EXPLICIET, iOS-proof) ===
+// === ELEMENTEN ===
 const wedstrijdInput = document.getElementById("wedstrijdInput");
 const datumInput     = document.getElementById("datumInput");
 const wedsNaam       = document.getElementById("wedsNaam");
@@ -152,7 +162,7 @@ const tabel          = document.getElementById("tabel");
 const btnToon        = document.getElementById("btnToon");
 const btnPNG         = document.getElementById("btnPNG");
 
-// === VASTE FORMULE ===
+// === FORMULE ===
 const formule = [
     [0,1,2,6,4,5,3,7],
     [1,0,3,6,4,7,2,5],
@@ -166,7 +176,7 @@ window.addEventListener("load", () => {
     datumInput.value = localStorage.getItem("datum") || "";
 
     const spelers = JSON.parse(localStorage.getItem("spelers") || "[]");
-    document.querySelectorAll("#inputs input").forEach((inp, i) => {
+    document.querySelectorAll("#inputs input").forEach((inp,i)=>{
         inp.value = spelers[i] || "";
     });
 
@@ -188,18 +198,15 @@ function genereerOpstelling() {
         : "";
 
     tabel.innerHTML = "";
-
-    formule.forEach((kwart, i) => {
+    formule.forEach((kwart,i)=>{
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${i + 1}e</td>`;
-
-        kwart.forEach((idx, pos) => {
+        tr.innerHTML = `<td>${i+1}e</td>`;
+        kwart.forEach((idx,pos)=>{
             const td = document.createElement("td");
             td.textContent = namen[idx] || "";
-            if (pos >= 6) td.className = "wissel";
+            if(pos>=6) td.className="wissel";
             tr.appendChild(td);
         });
-
         tabel.appendChild(tr);
     });
 }
@@ -207,20 +214,20 @@ function genereerOpstelling() {
 // === KNOPPEN ===
 btnToon.addEventListener("click", genereerOpstelling);
 
-btnPNG.addEventListener("click", () => {
-    html2canvas(document.getElementById("opstellingContainer"), {
-        scale: 2,
-        backgroundColor: "#ffffff"
-    }).then(canvas => {
-        canvas.toBlob(blob => {
-            const file = new File([blob], "opstelling.png", { type: "image/png" });
-
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                navigator.share({ files: [file] });
+btnPNG.addEventListener("click", ()=>{
+    html2canvas(document.getElementById("opstellingContainer"),{
+        scale:2,
+        width:900,
+        backgroundColor:"#ffffff"
+    }).then(canvas=>{
+        canvas.toBlob(blob=>{
+            const file = new File([blob],"opstelling.png",{type:"image/png"});
+            if(navigator.canShare && navigator.canShare({files:[file]})){
+                navigator.share({files:[file]});
             } else {
-                const a = document.createElement("a");
-                a.href = URL.createObjectURL(blob);
-                a.download = "opstelling.png";
+                const a=document.createElement("a");
+                a.href=URL.createObjectURL(blob);
+                a.download="opstelling.png";
                 a.click();
             }
         });
